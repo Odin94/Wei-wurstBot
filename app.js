@@ -5,6 +5,7 @@ A simple echo bot for the Microsoft Bot Framework.
 var restify = require('restify');
 var builder = require('botbuilder');
 var botbuilder_azure = require("botbuilder-azure");
+var storage = require("./storage");
 
 // Setup Restify Server
 var server = restify.createServer();
@@ -28,15 +29,9 @@ server.post('/api/messages', connector.listen());
  * For samples and documentation, see: https://github.com/Microsoft/BotBuilder-Azure
  * ---------------------------------------------------------------------------------------- */
 
-var tableName = 'botdata';
-var azureTableClient = new botbuilder_azure.AzureTableClient(tableName, process.env['AzureWebJobsStorage']);
-var tableStorage = new botbuilder_azure.AzureBotStorage({
-    gzipData: false
-}, azureTableClient);
-
 // Create your bot with a function to receive messages from the user
 var bot = new builder.UniversalBot(connector);
-bot.set('storage', tableStorage);
+bot.set('storage', storage);
 
 bot.dialog('/', function (session) {
     var response;
@@ -57,6 +52,10 @@ function get_response(user, text) {
         if (!isNaN(number)) numbers.push(number);
     }
     if (numbers.length === 4) {
+        session.userData[user] = numbers;
+        session.conversationData[new Date().toISOString().replace(/:/g, "-")] = JSON.stringify(numbers);
+        session.save();
+
         return `WW: ${numbers[0]}, Wi: ${numbers[1]}, De: ${numbers[2]}, Br: ${numbers[3]}`;
     } else {
         return "Please enter four numbers";
