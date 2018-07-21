@@ -39,11 +39,11 @@ var bot = new builder.UniversalBot(connector);
 bot.set('storage', tableStorage);
 
 bot.dialog('/', function (session) {
-    const response = get_response(JSON.stringify(session), session.message.text);
+    var response = get_response(JSON.stringify(session), session.message.text);
     session.send(response);
 });
 
 function get_response(user, text) {
-    if (text.includes("Hi")) return `Sup, ${user}`;
-    return `I heard you, ${user}..  ${text}`;
+    if (text.includes("Hi")) return "Sup, " + user;
+    return "I heard you, " + user + ".. " + text;
 }
