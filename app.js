@@ -39,7 +39,12 @@ var bot = new builder.UniversalBot(connector);
 bot.set('storage', tableStorage);
 
 bot.dialog('/', function (session) {
+    try {
     var response = get_response(JSON.stringify(session), session.message.text);
+    }
+    catch (err) {
+        session.send(err);
+    }
     session.send(response);
 });
 
