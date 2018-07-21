@@ -43,14 +43,22 @@ bot.dialog('/', function (session) {
     try {
         response = get_response(session.message.user.name, session.message.text);
     } catch (err) {
-        session.send(err);
-        response = ":c";
+        response = err;
     }
 
     session.send(response);
 });
 
 function get_response(user, text) {
-    if (text.includes("Hi")) return "Sup, " + user;
-    return "I heard you, " + user + ".. " + text;
+    var chars = text.split("");
+    var numbers = [];
+    for (var char of chars) {
+        var number = parseInt(char);
+        if (!isNaN(number)) numbers.push(number);
+    }
+    if (numbers.length === 4) {
+        return `WW: ${numbers[0]}, Wi: ${numbers[1]}, De: ${numbers[2]}, Br: ${numbers[3]}`;
+    } else {
+        return "Please enter four numbers";
+    }
 }
