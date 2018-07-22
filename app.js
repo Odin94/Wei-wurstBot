@@ -4,8 +4,9 @@ A simple echo bot for the Microsoft Bot Framework.
 
 var restify = require('restify');
 var builder = require('botbuilder');
-var botbuilder_azure = require("botbuilder-azure");
 var storage = require("./storage");
+var moment = require("moment-timezone");
+
 
 // Setup Restify Server
 var server = restify.createServer();
@@ -36,7 +37,7 @@ bot.set('storage', storage);
 bot.dialog('/', function (session) {
     var response;
     try {
-        response = get_response(session.message.user.name, session.message.text, session);
+        response = get_response(session);
     } catch (err) {
         response = err;
     }
@@ -44,21 +45,30 @@ bot.dialog('/', function (session) {
     session.send(response);
 });
 
-function get_response(user, text, session) {
-    var chars = text.split("");
-    var numbers = [];
+function get_response(session) {
+    var chars = session.message.text.split("");
+    var order = [];
     for (var char of chars) {
         var number = parseInt(char);
-        if (!isNaN(number)) numbers.push(number);
+        if (!isNaN(number)) order.push(number);
     }
 
-    if (numbers.length === 4) {
-        session.userData[user] = numbers;
-        session.conversationData[new Date().toISOString().replace(/:/g, "-")] = JSON.stringify(numbers);
-        session.save();
+    if (order.length === 4) {
+        set_current_order(order, session);
 
-        return `WW: ${numbers[0]}, Wi: ${numbers[1]}, De: ${numbers[2]}, Br: ${numbers[3]}`;
+        return `WW: ${order[0]}, Wi: ${order[1]}, De: ${order[2]}, Br: ${order[3]}`;
     } else {
         return `Please enter four numbers`;
     }
+}
+
+function set_current_order(order, session) {
+    var momentBerlin = moment.tz("Europe/Berlin");
+
+    var current_week = momentBerlin.week();
+    if (momentBerlin.day() >= 5 || momentBerlin.day() === 0) current_week += 1;  // orders made on/after Friday count for next week (Sunday is 0)
+
+    session.userData[session.message.user.name] = order;
+    session.conversationData[current_week] = order;
+    session.save();
 }
