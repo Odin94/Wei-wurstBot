@@ -66,7 +66,7 @@ function set_current_order(order, session) {
     var momentBerlin = moment.tz("Europe/Berlin");
 
     var current_week = momentBerlin.week();
-    if (momentBerlin.day() >= 5 || momentBerlin.day() === 0) current_week += 1;  // orders made on/after Friday count for next week (Sunday is 0)
+    if (momentBerlin.isoWeekday() >= 5) current_week += 1;  // orders made on/after Friday count for next week
 
     session.userData[session.message.user.name] = order;
     session.conversationData[current_week] = order;
