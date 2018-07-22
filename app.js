@@ -36,7 +36,7 @@ bot.set('storage', storage);
 bot.dialog('/', function (session) {
     var response;
     try {
-        response = get_response(session.message.user.name, session.message.text);
+        response = get_response(session.message.user.name, session.message.text, session);
     } catch (err) {
         response = err;
     }
@@ -44,13 +44,14 @@ bot.dialog('/', function (session) {
     session.send(response);
 });
 
-function get_response(user, text) {
+function get_response(user, text, session) {
     var chars = text.split("");
     var numbers = [];
     for (var char of chars) {
         var number = parseInt(char);
         if (!isNaN(number)) numbers.push(number);
     }
+
     if (numbers.length === 4) {
         session.userData[user] = numbers;
         session.conversationData[new Date().toISOString().replace(/:/g, "-")] = JSON.stringify(numbers);
@@ -58,6 +59,6 @@ function get_response(user, text) {
 
         return `WW: ${numbers[0]}, Wi: ${numbers[1]}, De: ${numbers[2]}, Br: ${numbers[3]}`;
     } else {
-        return "Please enter four numbers";
+        return `Please enter four numbers`;
     }
 }
