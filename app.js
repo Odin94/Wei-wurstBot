@@ -2,20 +2,21 @@
 A simple echo bot for the Microsoft Bot Framework. 
 -----------------------------------------------------------------------------*/
 
-var restify = require('restify');
-var builder = require('botbuilder');
-var storage = require("./storage");
-var moment = require("moment-timezone");
+const restify = require('restify');
+const builder = require('botbuilder');
+const builderTeams = require('botbuilder-teams');
+const storage = require("./storage");
+const moment = require("moment-timezone");
 
 
 // Setup Restify Server
-var server = restify.createServer();
+const server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log('%s listening to %s', server.name, server.url);
 });
 
 // Create chat connector for communicating with the Bot Framework Service
-var connector = new builder.ChatConnector({
+const connector = new builder.ChatConnector({
     appId: process.env.MicrosoftAppId,
     appPassword: process.env.MicrosoftAppPassword,
     openIdMetadata: process.env.BotOpenIdMetadata
@@ -31,11 +32,11 @@ server.post('/api/messages', connector.listen());
  * ---------------------------------------------------------------------------------------- */
 
 // Create your bot with a function to receive messages from the user
-var bot = new builder.UniversalBot(connector);
+const bot = new builder.UniversalBot(connector);
 bot.set('storage', storage);
 
 bot.dialog('/', function (session) {
-    var response;
+    let response;
     try {
         response = get_response(session);
     } catch (err) {
@@ -46,10 +47,10 @@ bot.dialog('/', function (session) {
 });
 
 function get_response(session) {
-    var chars = session.message.text.split("");
-    var order = [];
-    for (var char of chars) {
-        var number = parseInt(char);
+    const chars = session.message.text.split("");
+    const order = [];
+    for (let char of chars) {
+        const number = parseInt(char);
         if (!isNaN(number)) order.push(number);
     }
 
@@ -63,10 +64,10 @@ function get_response(session) {
 }
 
 function set_current_order(order, session) {
-    var momentBerlin = moment.tz("Europe/Berlin");
+    const momentBerlin = moment.tz("Europe/Berlin");
 
-    var current_week = momentBerlin.week();
-    if (momentBerlin.isoWeekday() >= 5) current_week += 1;  // orders made on/after Friday count for next week
+    let current_week = momentBerlin.week();
+    if (momentBerlin.isoWeekday() >= 5) current_week += 1; // orders made on/after Friday count for next week
 
     session.userData[session.message.user.name] = order;
     session.conversationData[current_week] = order;
