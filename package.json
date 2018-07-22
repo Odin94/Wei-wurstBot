@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "azure-publish": "node publish.js"
   },
@@ -12,6 +13,7 @@
   "dependencies": {
     "botbuilder": "^3.13.1",
     "botbuilder-azure": "^3.0.4",
+    "botbuilder-teams": "^0.2.1",
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.21",
     "restify": "^5.0.0"

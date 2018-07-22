@@ -16,9 +16,9 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 });
 
 // Create chat connector for communicating with the Bot Framework Service
-const connector = new builder.ChatConnector({
-    appId: process.env.MicrosoftAppId,
-    appPassword: process.env.MicrosoftAppPassword,
+const connector = new builderTeams.TeamsChatConnector({
+    appId: "6269ffeb-7c3f-4781-b69f-30cd28fe91e9",
+    appPassword: require("./private/keys.json").appPassword,
     openIdMetadata: process.env.BotOpenIdMetadata
 });
 
