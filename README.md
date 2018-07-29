@@ -1,5 +1,12 @@
 # WeißwurstBot
 
+## How to run:
+1. Create directory `private`
+2. Create `private/keys.json`
+3. Put valid AppId, AppKey and azure table db key in `keys.json`
+4. Update bot registration to point to a valid url (don't forget `/api/messages` at the end)
+5. Run `npm install`, then `node app.js`
+
 
 ## Use Azure app service editor
 

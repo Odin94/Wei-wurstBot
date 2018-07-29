@@ -1,0 +1,54 @@
+{
+  "$schema": "https://statics.teams.microsoft.com/sdk/v1.1/manifest/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.1",
+  "version": "1.0.0",
+  "id": "572a9a56-7caf-4449-86ea-e57af4c3923b",
+  "packageName": "com.WeisswurstBot",
+  "developer": {
+    "name": "Andreas Kammerloher",
+    "websiteUrl": "http://test.com",
+    "privacyUrl": "http://test.com",
+    "termsOfUseUrl": "http://test.com"
+  },
+  "name": {
+    "short": "WeisswurstBot",
+    "full": "WeisswurstBot"
+  },
+  "description": {
+    "short": "This is a Weißwurstbot. It bots Weißwurst.",
+    "full": "This is a Weißwurstbot. It bots Weißwurst."
+  },
+  "icons": {
+    "outline": "20x20.png",
+    "color": "96x96.png"
+  },
+  "accentColor": "#68ba8d",
+  "bots": [{
+    "botId": "572a9a56-7caf-4449-86ea-e57af4c3923b",
+    "needsChannelSelector": true,
+    "isNotificationOnly": false,
+    "scopes": ["team", "personal"],
+    "commandLists": [{
+        "scopes": ["team"],
+        "commands": [{
+          "title": "memes",
+          "description": "Gets a list of channels in the team."
+        }]
+      },
+      {
+        "scopes": ["personal"],
+        "commands": [{
+          "title": "wwsummary",
+          "description": "Sends you a summary of this weeks orders."
+        }]
+      }
+    ]
+  }],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "*.ngrok.io"
+  ]
+}

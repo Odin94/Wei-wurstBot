@@ -8,6 +8,7 @@ const builderTeams = require('botbuilder-teams');
 const storage = require("./storage");
 const moment = require("moment-timezone");
 
+const keys = require("./private/keys.json");
 
 // Setup Restify Server
 const server = restify.createServer();
@@ -17,8 +18,8 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 
 // Create chat connector for communicating with the Bot Framework Service
 const connector = new builderTeams.TeamsChatConnector({
-    appId: "6269ffeb-7c3f-4781-b69f-30cd28fe91e9",
-    appPassword: require("./private/keys.json").appPassword,
+    appId: keys.appId, // TODO: replace these with new ones from channel bot, then host with ngrok and set endpoint to your ngrok url
+    appPassword: keys.appPassword,
     openIdMetadata: process.env.BotOpenIdMetadata
 });
 
@@ -35,16 +36,84 @@ server.post('/api/messages', connector.listen());
 const bot = new builder.UniversalBot(connector);
 bot.set('storage', storage);
 
-bot.dialog('/', function (session) {
-    let response;
-    try {
-        response = get_response(session);
-    } catch (err) {
-        response = err;
-    }
+const dialog = new builder.IntentDialog();
 
-    session.send(response);
+dialog.matches(/(.*?)/, [
+    (session, args, next) => {
+        console.log("match anything");
+        session.send("match anything");
+    }
+]);
+
+// channel dialog
+dialog.matches(/^memes/i, [
+    (session, args, next) => {
+        console.log("memes message");
+        try {
+            connector.fetchChannelList(
+                session.message.address.serviceUrl,
+                session.message.sourceEvent.team.id,
+                (err, result) => {
+                    if (err) {
+                        session.endDialog(JSON.stringify(err));
+                    } else {
+                        session.send("nicememes");
+                        session.endDialog(JSON.stringify(result));
+                    }
+                }
+            )
+        } catch (err) {
+            session.send("There was an error; chances are it's cause you're in a private conversation and not in a channel.");
+            session.endDialog(JSON.stringify(err));
+        }
+    }
+]);
+
+// 1 on 1 dialog
+dialog.matches(/^wwsummary/i, [
+    (session, args, next) => {
+        console.log("wwsummary message");
+        if (session.message.text.toLowerCase() === "wwsummary") {
+            const address = {
+                channelId: 'msteams',
+                user: {
+                    id: session.message.user.id
+                },
+                channelData: {
+                    tenant: {
+                        id: session.message.sourceEvent.tenant.id
+                    }
+                },
+                bot: {
+                    id: keys.appId,
+                    name: "WeisswurstBot"
+                },
+                serviceUrl: session.message.address.serviceUrl,
+                useAuth: true
+            };
+            session.send("nicememes");
+            bot.beginDialog(address, 'WW_summary_this_week');
+        }
+    }
+]);
+
+bot.dialog('WW_summary_this_week', (session, args, next) => {
+    builder.Prompts.text(session, "Hi buddy");
+    // TODO: send WW summary for the week here
 });
+
+bot.dialog('/', dialog);
+
+//          function (session) {
+//     let response;
+//     try {
+//         response = get_response(session);
+//     } catch (err) {
+//         response = err;
+//     }
+
+//     session.send(response);
+// });
 
 function get_response(session) {
     const chars = session.message.text.split("");
